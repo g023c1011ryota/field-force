@@ -3,28 +3,39 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, Camera, Check, Calendar, MapPin, Home, CircleCheck, ClipboardList, FileText, Award } from 'lucide-react';
+import { ChevronLeft, Camera, Check, Calendar, MapPin, Home, CircleCheck, ClipboardList, FileText, Award, X } from 'lucide-react';
 
 export default function ReportPage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null); // カメラ起動用の参照を作成
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // 入力内容を管理する状態
   const [reportText, setReportText] = useState("");
+  // 写真のプレビューURLを管理する状態
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // バリデーション：文字が1文字以上入っているか？
+  // バリデーション
   const isFormValid = reportText.trim().length > 0;
 
-  // 写真ボタンが押された時の処理
   const handlePhotoClick = () => {
-    // 隠してあるファイル選択ダイアログをクリックさせる
     fileInputRef.current?.click();
   };
 
-  // ファイルが選択された時の処理（今回はログに出すだけ）
+  // 写真が選ばれたら表示する処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      alert("画像が選択されました！(仮実装)");
+    const file = e.target.files?.[0];
+    if (file) {
+      // ファイルから表示用のURLを作る魔法
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  // 写真を削除する処理
+  const clearPhoto = () => {
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -73,16 +84,14 @@ export default function ReportPage() {
             value={reportText}
             onChange={(e) => setReportText(e.target.value)}
           ></textarea>
-          {/* 未入力時のメッセージを表示 */}
           {!isFormValid && (
             <p className="text-red-500 text-xs mt-1 font-bold">※完了するには報告の入力が必要です</p>
           )}
         </div>
 
-        {/* 写真追加 */}
+        {/* 写真追加エリア（機能強化！） */}
         <div>
           <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">写真</label>
-          {/* 隠しファイル入力（カメラ起動用） */}
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -91,13 +100,28 @@ export default function ReportPage() {
             accept="image/*" 
             capture="environment"
           />
-          <button 
-            onClick={handlePhotoClick}
-            className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200"
-          >
-            <Camera size={24} className="mb-1" />
-            <span className="text-[10px] font-bold">追加</span>
-          </button>
+          
+          {previewUrl ? (
+            // 写真があるときはこっちを表示
+            <div className="relative w-full h-48 border-2 border-black bg-gray-100">
+              <img src={previewUrl} alt="プレビュー" className="w-full h-full object-cover" />
+              <button 
+                onClick={clearPhoto}
+                className="absolute top-2 right-2 bg-black text-white p-1 rounded-full shadow-md hover:bg-gray-800 transition"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            // 写真がないときはボタンを表示
+            <button 
+              onClick={handlePhotoClick}
+              className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200"
+            >
+              <Camera size={24} className="mb-1" />
+              <span className="text-[10px] font-bold">追加</span>
+            </button>
+          )}
         </div>
         
         {/* 完了ボタン */}
