@@ -1,17 +1,32 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Camera, Check, Calendar, MapPin, Home, CircleCheck, ClipboardList, FileText, Award } from 'lucide-react';
 
 export default function ReportPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null); // カメラ起動用の参照を作成
+  
   // 入力内容を管理する状態
   const [reportText, setReportText] = useState("");
 
-  // 文字が入っているかチェック（1文字以上あればボタンを有効にする）
+  // バリデーション：文字が1文字以上入っているか？
   const isFormValid = reportText.trim().length > 0;
+
+  // 写真ボタンが押された時の処理
+  const handlePhotoClick = () => {
+    // 隠してあるファイル選択ダイアログをクリックさせる
+    fileInputRef.current?.click();
+  };
+
+  // ファイルが選択された時の処理（今回はログに出すだけ）
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      alert("画像が選択されました！(仮実装)");
+    }
+  };
 
   return (
     <main 
@@ -41,43 +56,59 @@ export default function ReportPage() {
 
         {/* 指示内容 */}
         <div>
-          <label className="block text-sm font-black text-gray-900 mb-2">指示内容</label>
-          <div className="bg-white p-4 border-2 border-black text-sm text-gray-700 shadow-sm">
+          <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">指示内容</label>
+          <div className="bg-white p-4 border-2 border-black text-sm text-gray-700 leading-relaxed shadow-sm">
             Q4の新製品ラインナップをプレゼンしてください。特にAI機能について重点的に説明し、価格モデルについてのフィードバックをいただいてください。
           </div>
         </div>
 
         {/* 完了報告（必須項目） */}
         <div>
-          <label className="block text-sm font-black text-gray-900 mb-2">
+          <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">
             完了報告 <span className="text-red-500">*</span>
           </label>
           <textarea 
             className="w-full h-40 p-4 border-2 border-black bg-white focus:outline-none focus:ring-2 focus:ring-black text-sm placeholder-gray-400 shadow-sm resize-none"
-            placeholder="訪問メモを入力..."
+            placeholder="訪問メモを入力してください（必須）"
             value={reportText}
             onChange={(e) => setReportText(e.target.value)}
           ></textarea>
+          {/* 未入力時のメッセージを表示 */}
+          {!isFormValid && (
+            <p className="text-red-500 text-xs mt-1 font-bold">※完了するには報告の入力が必要です</p>
+          )}
         </div>
 
         {/* 写真追加 */}
         <div>
-          <label className="block text-sm font-black text-gray-900 mb-2">写真</label>
-          <button className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500">
+          <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">写真</label>
+          {/* 隠しファイル入力（カメラ起動用） */}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            className="hidden" 
+            accept="image/*" 
+            capture="environment"
+          />
+          <button 
+            onClick={handlePhotoClick}
+            className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200"
+          >
             <Camera size={24} className="mb-1" />
             <span className="text-[10px] font-bold">追加</span>
           </button>
         </div>
         
-        {/* 完了ボタン：入力がない間は disabled（無効）になる */}
+        {/* 完了ボタン */}
         <div className="pt-4">
           <button 
             onClick={() => router.push('/pet')}
-            disabled={!isFormValid}
-            className={`block w-full text-center font-bold py-4 border-2 border-black shadow-lg transition-all flex items-center justify-center gap-2 text-lg ${
+            disabled={!isFormValid} 
+            className={`block w-full text-center font-bold py-4 border-2 transition-all flex items-center justify-center gap-2 text-lg ${
               isFormValid 
-              ? 'bg-black text-white active:translate-y-[2px] active:shadow-none' 
-              : 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed shadow-none'
+              ? 'bg-black text-white border-black shadow-lg active:translate-y-[2px] active:shadow-none cursor-pointer' 
+              : 'bg-gray-300 text-gray-500 border-gray-400 shadow-none cursor-not-allowed opacity-70'
             }`}
           >
             <span>タスクを完了する</span>
@@ -85,6 +116,16 @@ export default function ReportPage() {
           </button>
         </div>
       </div>
+
+      <nav className="absolute bottom-0 w-full bg-white border-t border-gray-100 pb-8 pt-3 z-40">
+        <div className="flex justify-around px-4">
+          <Link href="/pet" className="flex flex-col items-center gap-1 text-gray-400"><Home size={24} /><span className="text-[9px] font-bold">ホーム</span></Link>
+          <Link href="/checkin" className="flex flex-col items-center gap-1 text-gray-400"><CircleCheck size={24} /><span className="text-[9px] font-bold">打刻</span></Link>
+          <div className="flex flex-col items-center gap-1 text-blue-600"><ClipboardList size={24} /><span className="text-[9px] font-bold">タスク</span></div>
+          <div className="flex flex-col items-center gap-1 text-gray-400"><FileText size={24} /><span className="text-[9px] font-bold">日報</span></div>
+          <div className="flex flex-col items-center gap-1 text-gray-400"><Award size={24} /><span className="text-[9px] font-bold">実績</span></div>
+        </div>
+      </nav>
     </main>
   );
 }

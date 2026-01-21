@@ -1,13 +1,22 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css"; // さっき作ったファイルをここで読み込みます
 
-import { AuthProvider } from "@/features/auth/components/AuthProvider";
+const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const metadata: Metadata = {
+  title: "Field Force",
+  description: "フィールドセールス向け活動管理アプリ",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="ja">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
