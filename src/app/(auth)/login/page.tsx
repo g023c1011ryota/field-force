@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LoginForm } from "@/features/auth/LoginForm";
+import { LoginForm } from "@/features/auth/loginform";
 import { AuthLoadingCard } from "@/features/auth/AuthLoadingCard";
 
 export default function LoginPage() {

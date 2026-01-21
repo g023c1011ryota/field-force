@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## ディレクトリ構成と配置ルール
+
+詳細は `docs/architecture.md` を参照してください。
+
 ## Getting Started
 
 First, run the development server:
