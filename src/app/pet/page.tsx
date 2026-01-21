@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // 👈 useEffectを追加
 import Link from 'next/link';
 import { Home, CircleCheck, ClipboardList, FileText, Award, Bone, Heart } from 'lucide-react';
 
-// ハートのアニメーション用データの型定義
 type FloatingHeart = {
   id: number;
-  left: number; // 横位置（%）
-  scale: number; // 大きさ
-  duration: number; // アニメーション時間
+  left: number;
+  scale: number;
+  duration: number;
 };
 
 export default function PetPage() {
@@ -18,43 +17,55 @@ export default function PetPage() {
   const maxFeed = 5;
   const [hearts, setHearts] = useState<FloatingHeart[]>([]);
 
+  // ✅ 追加：画面が表示されたら保存データを読み込む
+  useEffect(() => {
+    const savedLevel = localStorage.getItem('pet_level');
+    const savedFeed = localStorage.getItem('pet_feed');
+
+    if (savedLevel) {
+      setLevel(parseInt(savedLevel));
+    }
+    if (savedFeed) {
+      setFeedCount(parseInt(savedFeed));
+    }
+  }, []);
+
   // 餌やりボタンを押したときの処理
   const handleFeed = () => {
-    // ------------------------------------------------
-    // 1. ハートを3つ出す演出 (改良版：デカく！3連射！)
-    // ------------------------------------------------
+    // 1. ハートを3つ出す演出
     const newHearts: FloatingHeart[] = [];
-    
-    // 3回ループしてハートを作る
     for (let i = 0; i < 3; i++) {
       const newHeart: FloatingHeart = {
-        id: Date.now() + i, // IDが被らないようにインデックスを足す
-        left: 50 + (Math.random() * 80 - 40), // 散らばり具合を広げる (10% ~ 90% の範囲)
-        scale: 1.5 + Math.random() * 1.5,     // 大きさを大幅アップ！ (1.5倍〜3.0倍)
+        id: Date.now() + i,
+        left: 50 + (Math.random() * 80 - 40),
+        scale: 1.5 + Math.random() * 1.5,
         duration: 0.8 + Math.random() * 0.5
       };
       newHearts.push(newHeart);
-
-      // 個別に消滅タイマーをセット
       setTimeout(() => {
         setHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
       }, 1500);
     }
-
-    // まとめて画面に追加
     setHearts((prev) => [...prev, ...newHearts]);
 
-    // ------------------------------------------------
-    // 2. レベルアップのロジック
-    // ------------------------------------------------
+    // 2. レベルアップのロジック（保存機能付き）
+    let newLevel = level;
+    let newFeedCount = feedCount;
+
     if (feedCount + 1 >= maxFeed) {
-      // 満タンになったらレベルアップしてリセット
-      setLevel((prev) => prev + 1);
-      setFeedCount(0);
+      newLevel = level + 1;
+      newFeedCount = 0;
     } else {
-      // それ以外はカウントアップ
-      setFeedCount((prev) => prev + 1);
+      newFeedCount = feedCount + 1;
     }
+
+    // 状態を更新
+    setLevel(newLevel);
+    setFeedCount(newFeedCount);
+
+    // ✅ 追加：データを保存する
+    localStorage.setItem('pet_level', newLevel.toString());
+    localStorage.setItem('pet_feed', newFeedCount.toString());
   };
 
   return (
@@ -64,7 +75,6 @@ export default function PetPage() {
         backgroundImage: "url('/petbackground.jpg')" 
       }}
     >
-      {/* CSSアニメーションの定義 */}
       <style jsx>{`
         @keyframes floatUp {
           0% { transform: translateY(0) scale(1); opacity: 1; }
@@ -72,20 +82,14 @@ export default function PetPage() {
         }
       `}</style>
 
-      {/* --------------------------------------
-          ① 左上：ステータスカード
-      --------------------------------------- */}
+      {/* ステータスカード */}
       <div className="absolute top-12 left-6 z-10 w-40 rounded-3xl bg-white/95 p-4 shadow-sm backdrop-blur-md">
-        
-        {/* 上段：Lvバッジと名前 */}
         <div className="flex items-center gap-2 mb-2">
           <div className="rounded-full bg-yellow-400 px-2 py-0.5 text-[10px] font-bold text-white">
             Lv.{level}
           </div>
           <span className="text-xs font-bold text-gray-800">柴犬</span>
         </div>
-
-        {/* 下段：ステータスリスト */}
         <div className="space-y-1 text-xs font-bold text-gray-500">
           <div className="flex justify-between items-center">
             <span>訪問数</span>
@@ -98,22 +102,17 @@ export default function PetPage() {
         </div>
       </div>
 
-      {/* --------------------------------------
-          ② 中央左：吹き出しメッセージ
-      --------------------------------------- */}
+      {/* 吹き出し */}
       <div className="absolute top-40 left-6 z-10 w-48 animate-pulse">
         <div className="relative rounded-2xl bg-white p-3 shadow-md text-left">
           <p className="text-xs font-bold text-gray-700 leading-relaxed">
             昨日の日報提出<br />忘れないでね！
           </p>
-          {/* しっぽの位置 */}
           <div className="absolute -bottom-1 -right-1 h-4 w-4 -translate-x-1/2 rotate-45 bg-white"></div>
         </div>
       </div>
 
-      {/* --------------------------------------
-          ③ 中央下：ペット画像の表示エリア ＋ ハート
-      --------------------------------------- */}
+      {/* ペット画像 */}
       <div className="absolute bottom-36 left-1/2 z-0 -translate-x-1/2 transform flex justify-center w-full pointer-events-none">
         <div className="relative">
           <img 
@@ -121,8 +120,6 @@ export default function PetPage() {
             alt="My Pet" 
             className="w-72 h-auto drop-shadow-xl object-contain relative z-10"
           />
-          
-          {/* ハートのエフェクト表示 */}
           {hearts.map((heart) => (
             <div
               key={heart.id}
@@ -139,9 +136,7 @@ export default function PetPage() {
         </div>
       </div>
 
-      {/* --------------------------------------
-          ④ 右下：餌やりアクションボタン
-      --------------------------------------- */}
+      {/* 餌やりボタン */}
       <div className="absolute bottom-28 right-6 z-10 flex flex-col items-center rounded-2xl bg-white/95 p-3 shadow-md backdrop-blur-md">
         <button 
           onClick={handleFeed}
@@ -159,9 +154,7 @@ export default function PetPage() {
         <span className="mt-0.5 text-[9px] text-gray-400">{feedCount}/{maxFeed}</span>
       </div>
 
-      {/* --------------------------------------
-          ⑤ 最下部：ナビゲーションバー
-      --------------------------------------- */}
+      {/* ナビゲーション */}
       <div className="absolute bottom-0 w-full bg-white border-t border-gray-100 pb-8 pt-3 rounded-t-3xl z-20">
         <div className="flex justify-around px-4">
           <Link href="/pet" className="flex flex-col items-center gap-1 text-blue-600">
@@ -186,7 +179,6 @@ export default function PetPage() {
           </div>
         </div>
       </div>
-
     </main>
   );
 }

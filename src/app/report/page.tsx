@@ -9,34 +9,46 @@ export default function ReportPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // 入力内容を管理する状態
   const [reportText, setReportText] = useState("");
-  // 写真のプレビューURLを管理する状態
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // バリデーション
   const isFormValid = reportText.trim().length > 0;
 
   const handlePhotoClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 写真が選ばれたら表示する処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // ファイルから表示用のURLを作る魔法
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
   };
 
-  // 写真を削除する処理
   const clearPhoto = () => {
     setPreviewUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  // ✅ 追加：タスク完了時の処理
+  const handleComplete = () => {
+    // 1. 今のデータを読み込む（無ければデフォルト3）
+    const currentFeed = parseInt(localStorage.getItem('pet_feed') || '3');
+    const maxFeed = 5;
+
+    // 2. エサを1つ増やす（最大値を超えたらループさせたり、レベルアップの計算をここでするかはお好みで。今回は単純に+1）
+    // ※もし「タスク完了＝即レベルアップ」にしたい場合はここで計算が必要ですが、
+    // 　一旦「経験値がたまる」挙動にします。
+    const newFeed = currentFeed + 1;
+
+    // 3. 保存する
+    localStorage.setItem('pet_feed', newFeed.toString());
+
+    // 4. ペット画面へ移動
+    router.push('/pet');
   };
 
   return (
@@ -73,7 +85,7 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* 完了報告（必須項目） */}
+        {/* 完了報告 */}
         <div>
           <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">
             完了報告 <span className="text-red-500">*</span>
@@ -89,7 +101,7 @@ export default function ReportPage() {
           )}
         </div>
 
-        {/* 写真追加エリア（機能強化！） */}
+        {/* 写真追加エリア */}
         <div>
           <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">写真</label>
           <input 
@@ -102,7 +114,6 @@ export default function ReportPage() {
           />
           
           {previewUrl ? (
-            // 写真があるときはこっちを表示
             <div className="relative w-full h-48 border-2 border-black bg-gray-100">
               <img src={previewUrl} alt="プレビュー" className="w-full h-full object-cover" />
               <button 
@@ -113,7 +124,6 @@ export default function ReportPage() {
               </button>
             </div>
           ) : (
-            // 写真がないときはボタンを表示
             <button 
               onClick={handlePhotoClick}
               className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200"
@@ -127,7 +137,7 @@ export default function ReportPage() {
         {/* 完了ボタン */}
         <div className="pt-4">
           <button 
-            onClick={() => router.push('/pet')}
+            onClick={handleComplete} // 👈 ここを変更しました！
             disabled={!isFormValid} 
             className={`block w-full text-center font-bold py-4 border-2 transition-all flex items-center justify-center gap-2 text-lg ${
               isFormValid 
