@@ -1,10 +1,31 @@
-import { LoginActions } from "./_components/LoginActions";
+"use client";
+
+import { useState } from "react";
+import { LoginForm } from "@/features/auth/loginform";
+import { AuthLoadingCard } from "@/features/auth/AuthLoadingCard";
 
 export default function LoginPage() {
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
   return (
-    <main>
-      <h1>Sign in</h1>
-      <LoginActions />
-    </main>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: "url(/images/background.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      {/* 中央カード */}
+      {!isAuthenticating ? (
+        <LoginForm onLoginClick={() => setIsAuthenticating(true)} />
+      ) : (
+        <AuthLoadingCard />
+      )}
+    </div>
   );
 }
