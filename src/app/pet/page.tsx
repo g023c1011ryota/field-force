@@ -21,20 +21,28 @@ export default function PetPage() {
   // 餌やりボタンを押したときの処理
   const handleFeed = () => {
     // ------------------------------------------------
-    // 1. ハートを出す演出
+    // 1. ハートを3つ出す演出 (改良版：デカく！3連射！)
     // ------------------------------------------------
-    const newHeart: FloatingHeart = {
-      id: Date.now(),
-      left: 50 + (Math.random() * 40 - 20), // 30%〜70%の位置にランダム表示
-      scale: 0.8 + Math.random() * 0.7,     // 大きさをランダムに
-      duration: 0.8 + Math.random() * 0.5   // スピードをランダムに
-    };
-    setHearts((prev) => [...prev, newHeart]);
+    const newHearts: FloatingHeart[] = [];
+    
+    // 3回ループしてハートを作る
+    for (let i = 0; i < 3; i++) {
+      const newHeart: FloatingHeart = {
+        id: Date.now() + i, // IDが被らないようにインデックスを足す
+        left: 50 + (Math.random() * 80 - 40), // 散らばり具合を広げる (10% ~ 90% の範囲)
+        scale: 1.5 + Math.random() * 1.5,     // 大きさを大幅アップ！ (1.5倍〜3.0倍)
+        duration: 0.8 + Math.random() * 0.5
+      };
+      newHearts.push(newHeart);
 
-    // 1秒後（アニメーション終了後）にハートのデータを消す
-    setTimeout(() => {
-      setHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
-    }, 1500);
+      // 個別に消滅タイマーをセット
+      setTimeout(() => {
+        setHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
+      }, 1500);
+    }
+
+    // まとめて画面に追加
+    setHearts((prev) => [...prev, ...newHearts]);
 
     // ------------------------------------------------
     // 2. レベルアップのロジック
@@ -60,7 +68,7 @@ export default function PetPage() {
       <style jsx>{`
         @keyframes floatUp {
           0% { transform: translateY(0) scale(1); opacity: 1; }
-          100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+          100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
         }
       `}</style>
 
