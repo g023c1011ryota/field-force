@@ -2,12 +2,52 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Home, CircleCheck, ClipboardList, FileText, Award, Bone } from 'lucide-react';
+import { Home, CircleCheck, ClipboardList, FileText, Award, Bone, Heart } from 'lucide-react';
+
+// ハートのアニメーション用データの型定義
+type FloatingHeart = {
+  id: number;
+  left: number; // 横位置（%）
+  scale: number; // 大きさ
+  duration: number; // アニメーション時間
+};
 
 export default function PetPage() {
   const [level, setLevel] = useState(12);
   const [feedCount, setFeedCount] = useState(3);
   const maxFeed = 5;
+  const [hearts, setHearts] = useState<FloatingHeart[]>([]);
+
+  // 餌やりボタンを押したときの処理
+  const handleFeed = () => {
+    // ------------------------------------------------
+    // 1. ハートを出す演出
+    // ------------------------------------------------
+    const newHeart: FloatingHeart = {
+      id: Date.now(),
+      left: 50 + (Math.random() * 40 - 20), // 30%〜70%の位置にランダム表示
+      scale: 0.8 + Math.random() * 0.7,     // 大きさをランダムに
+      duration: 0.8 + Math.random() * 0.5   // スピードをランダムに
+    };
+    setHearts((prev) => [...prev, newHeart]);
+
+    // 1秒後（アニメーション終了後）にハートのデータを消す
+    setTimeout(() => {
+      setHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
+    }, 1500);
+
+    // ------------------------------------------------
+    // 2. レベルアップのロジック
+    // ------------------------------------------------
+    if (feedCount + 1 >= maxFeed) {
+      // 満タンになったらレベルアップしてリセット
+      setLevel((prev) => prev + 1);
+      setFeedCount(0);
+    } else {
+      // それ以外はカウントアップ
+      setFeedCount((prev) => prev + 1);
+    }
+  };
 
   return (
     <main 
@@ -16,7 +56,14 @@ export default function PetPage() {
         backgroundImage: "url('/petbackground.jpg')" 
       }}
     >
-      
+      {/* CSSアニメーションの定義 */}
+      <style jsx>{`
+        @keyframes floatUp {
+          0% { transform: translateY(0) scale(1); opacity: 1; }
+          100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+      `}</style>
+
       {/* --------------------------------------
           ① 左上：ステータスカード
       --------------------------------------- */}
@@ -44,9 +91,8 @@ export default function PetPage() {
       </div>
 
       {/* --------------------------------------
-          ② 中央左：吹き出しメッセージ（修正箇所）
+          ② 中央左：吹き出しメッセージ
       --------------------------------------- */}
-      {/* left-8 を left-6 に変更し、上のカードと左端を揃えました */}
       <div className="absolute top-40 left-6 z-10 w-48 animate-pulse">
         <div className="relative rounded-2xl bg-white p-3 shadow-md text-left">
           <p className="text-xs font-bold text-gray-700 leading-relaxed">
@@ -58,14 +104,31 @@ export default function PetPage() {
       </div>
 
       {/* --------------------------------------
-          ③ 中央下：ペット画像の表示エリア
+          ③ 中央下：ペット画像の表示エリア ＋ ハート
       --------------------------------------- */}
-      <div className="absolute bottom-36 left-1/2 z-0 -translate-x-1/2 transform flex justify-center">
-        <img 
-          src="/pet_dog.png" 
-          alt="My Pet" 
-          className="w-72 h-auto drop-shadow-xl object-contain"
-        />
+      <div className="absolute bottom-36 left-1/2 z-0 -translate-x-1/2 transform flex justify-center w-full pointer-events-none">
+        <div className="relative">
+          <img 
+            src="/pet_dog.png" 
+            alt="My Pet" 
+            className="w-72 h-auto drop-shadow-xl object-contain relative z-10"
+          />
+          
+          {/* ハートのエフェクト表示 */}
+          {hearts.map((heart) => (
+            <div
+              key={heart.id}
+              className="absolute bottom-20 text-pink-500 z-20"
+              style={{
+                left: `${heart.left}%`,
+                transform: `scale(${heart.scale})`,
+                animation: `floatUp ${heart.duration}s ease-out forwards`
+              }}
+            >
+              <Heart fill="currentColor" size={32} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* --------------------------------------
@@ -73,8 +136,8 @@ export default function PetPage() {
       --------------------------------------- */}
       <div className="absolute bottom-28 right-6 z-10 flex flex-col items-center rounded-2xl bg-white/95 p-3 shadow-md backdrop-blur-md">
         <button 
-          onClick={() => setFeedCount(Math.min(feedCount + 1, maxFeed))}
-          className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-orange-500 active:scale-90 transition shadow-sm"
+          onClick={handleFeed}
+          className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-orange-500 active:scale-90 transition shadow-sm active:bg-orange-200"
         >
           <Bone size={24} fill="currentColor" />
         </button>
