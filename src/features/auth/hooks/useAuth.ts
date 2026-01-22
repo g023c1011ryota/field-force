@@ -1,5 +1,13 @@
 "use client";
 
-import { useAuth as useOidcAuth } from "react-oidc-context";
+import { useContext } from "react";
 
-export const useAuth = () => useOidcAuth();
+import { AuthContext } from "@/features/auth/components/AuthProvider";
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("AuthProvider is missing");
+  }
+  return context;
+};

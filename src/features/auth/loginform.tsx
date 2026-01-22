@@ -1,12 +1,34 @@
 "use client";
 
-type Props = {
-  onLoginClick: () => void;
+import { useState, type FormEvent } from "react";
+
+type LoginPayload = {
+  identifier: string;
+  password: string;
 };
 
-export function LoginForm({ onLoginClick }: Props) {
+type Props = {
+  onLoginClick: (payload: LoginPayload) => void;
+  isSubmitting?: boolean;
+  errorMessage?: string | null;
+};
+
+export function LoginForm({
+  onLoginClick,
+  isSubmitting = false,
+  errorMessage,
+}: Props) {
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onLoginClick({ identifier, password });
+  };
+
   return (
-    <div
+    <form
+      onSubmit={handleSubmit}
       style={{
         maxWidth: 420,
         width: "100%",
@@ -22,14 +44,14 @@ export function LoginForm({ onLoginClick }: Props) {
         フィールドセールス・アプリ
       </h1>
 
-   <hr
-  style={{
-    margin: 0,              // ★ デフォルト余白を消す
-    marginBottom: 16,       // ★ 下だけ余白
-    border: "none",         // ★ デフォルトの線を消す
-    borderTop: "3px solid #000", // ★ 太い線を指定
-  }}
-/>
+      <hr
+        style={{
+          margin: 0, // ★ デフォルト余白を消す
+          marginBottom: 16, // ★ 下だけ余白
+          border: "none", // ★ デフォルトの線を消す
+          borderTop: "3px solid #000", // ★ 太い線を指定
+        }}
+      />
 
       <p
         style={{
@@ -49,6 +71,10 @@ export function LoginForm({ onLoginClick }: Props) {
         <input
           type="text"
           placeholder="user@example.com"
+          autoComplete="username"
+          value={identifier}
+          onChange={(event) => setIdentifier(event.target.value)}
+          disabled={isSubmitting}
           style={{
             width: "100%",
             padding: 12,
@@ -66,6 +92,10 @@ export function LoginForm({ onLoginClick }: Props) {
         <input
           type="password"
           placeholder="••••••••"
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          disabled={isSubmitting}
           style={{
             width: "100%",
             padding: 12,
@@ -87,18 +117,21 @@ export function LoginForm({ onLoginClick }: Props) {
         }}
       >
         <label>
-          <input type="checkbox" /> ログイン状態を保持
+          <input type="checkbox" disabled={isSubmitting} /> ログイン状態を保持
         </label>
 
         <a href="#">パスワードを忘れた場合</a>
       </div>
 
+      {errorMessage ? (
+        <div style={{ marginBottom: 16, color: "#c00", fontSize: 12 }}>
+          {errorMessage}
+        </div>
+      ) : null}
+
       <button
-        type="button"
-          onClick={() => {
-    console.log("login button clicked");
-    onLoginClick();
-  }}
+        type="submit"
+        disabled={isSubmitting}
         style={{
           width: "100%",
           padding: 14,
@@ -107,10 +140,12 @@ export function LoginForm({ onLoginClick }: Props) {
           fontSize: 16,
           border: "none",
           borderRadius: 4,
+          opacity: isSubmitting ? 0.7 : 1,
+          cursor: isSubmitting ? "not-allowed" : "pointer",
         }}
       >
         ログイン
       </button>
-    </div>
+    </form>
   );
 }

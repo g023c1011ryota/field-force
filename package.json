@@ -9,6 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.972.0",
+    "@aws-sdk/credential-provider-node": "^3.972.0",
+    "@aws-sdk/hash-node": "^3.374.0",
+    "@aws-sdk/protocol-http": "^3.374.0",
+    "@aws-sdk/signature-v4": "^3.374.0",
     "lucide-react": "^0.562.0",
     "next": "15.5.9",
     "oidc-client-ts": "^3.4.1",
