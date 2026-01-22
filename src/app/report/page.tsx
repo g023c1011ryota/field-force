@@ -33,21 +33,20 @@ export default function ReportPage() {
     }
   };
 
-  // ✅ 追加：タスク完了時の処理
+  // ✅ 修正：タスク完了時の処理
   const handleComplete = () => {
-    // 1. 今のデータを読み込む（無ければデフォルト3）
-    const currentFeed = parseInt(localStorage.getItem('pet_feed') || '3');
-    const maxFeed = 5;
+    // 1. エサの「在庫」を増やす（これが新しいロジック！）
+    // ※ 'pet_food_stock' という名前で保存します
+    const currentStock = parseInt(localStorage.getItem('pet_food_stock') || '0');
+    const newStock = currentStock + 1;
+    localStorage.setItem('pet_food_stock', newStock.toString());
 
-    // 2. エサを1つ増やす（最大値を超えたらループさせたり、レベルアップの計算をここでするかはお好みで。今回は単純に+1）
-    // ※もし「タスク完了＝即レベルアップ」にしたい場合はここで計算が必要ですが、
-    // 　一旦「経験値がたまる」挙動にします。
-    const newFeed = currentFeed + 1;
+    // 2. タスク完了数も増やす
+    const currentTaskCompleted = parseInt(localStorage.getItem('pet_task_completed') || '0');
+    const newTaskCompleted = currentTaskCompleted + 1;
+    localStorage.setItem('pet_task_completed', newTaskCompleted.toString());
 
-    // 3. 保存する
-    localStorage.setItem('pet_feed', newFeed.toString());
-
-    // 4. ペット画面へ移動
+    // 3. ペット画面へ移動
     router.push('/pet');
   };
 
@@ -101,7 +100,7 @@ export default function ReportPage() {
           )}
         </div>
 
-        {/* 写真追加エリア */}
+        {/* 写真追加 */}
         <div>
           <label className="block text-sm font-black text-gray-900 mb-2 drop-shadow-sm">写真</label>
           <input 
@@ -112,24 +111,14 @@ export default function ReportPage() {
             accept="image/*" 
             capture="environment"
           />
-          
           {previewUrl ? (
             <div className="relative w-full h-48 border-2 border-black bg-gray-100">
               <img src={previewUrl} alt="プレビュー" className="w-full h-full object-cover" />
-              <button 
-                onClick={clearPhoto}
-                className="absolute top-2 right-2 bg-black text-white p-1 rounded-full shadow-md hover:bg-gray-800 transition"
-              >
-                <X size={16} />
-              </button>
+              <button onClick={clearPhoto} className="absolute top-2 right-2 bg-black text-white p-1 rounded-full shadow-md hover:bg-gray-800 transition"><X size={16} /></button>
             </div>
           ) : (
-            <button 
-              onClick={handlePhotoClick}
-              className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200"
-            >
-              <Camera size={24} className="mb-1" />
-              <span className="text-[10px] font-bold">追加</span>
+            <button onClick={handlePhotoClick} className="w-24 h-24 bg-white border-2 border-dashed border-gray-400 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-600 transition shadow-sm active:bg-gray-200">
+              <Camera size={24} className="mb-1" /><span className="text-[10px] font-bold">追加</span>
             </button>
           )}
         </div>
@@ -137,7 +126,7 @@ export default function ReportPage() {
         {/* 完了ボタン */}
         <div className="pt-4">
           <button 
-            onClick={handleComplete} // 👈 ここを変更しました！
+            onClick={handleComplete}
             disabled={!isFormValid} 
             className={`block w-full text-center font-bold py-4 border-2 transition-all flex items-center justify-center gap-2 text-lg ${
               isFormValid 
