@@ -83,7 +83,11 @@ export default function CheckInPage() {
             <h1 className="text-lg font-bold text-gray-800">訪問打刻</h1>
           </div>
           {status !== 'VISITING' && (
-            <button onClick={toggleDistance} className="p-2 bg-yellow-100 text-yellow-600 rounded-full animate-pulse hover:bg-yellow-200 transition">
+            <button
+              onClick={toggleDistance}
+              aria-label="距離切替"
+              className="p-2 bg-transparent text-yellow-600 rounded-full opacity-0 hover:bg-transparent transition"
+            >
               <Zap size={16} />
             </button>
           )}
@@ -92,18 +96,18 @@ export default function CheckInPage() {
 
       <div className="flex-1 relative flex flex-col w-full h-full overflow-hidden">
         {status === 'VISITING' ? (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white bg-blue-900/20 backdrop-blur-[2px]">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-transparent">
             <div className="flex flex-col items-center w-full px-6">
-              <h2 className="text-2xl font-bold tracking-widest mb-2 text-green-600 drop-shadow-md">
+              <h2 className="text-2xl font-bold tracking-widest mb-2 text-green-600">
                 訪問中
               </h2>
-              <div className="text-5xl font-mono font-bold tracking-widest drop-shadow-lg text-gray-800">
+              <div className="text-5xl font-mono font-bold tracking-widest text-gray-700">
                 {formatTime(elapsedSeconds)}
               </div>
               <div className="w-full mt-12">
                  <button 
                   onClick={handleEnd}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-md shadow-lg border-2 border-red-800 transition-transform active:scale-95 text-lg"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-sm shadow-lg border-2 border-red-700 transition-transform active:scale-95 text-lg"
                 >
                   訪問終了
                 </button>

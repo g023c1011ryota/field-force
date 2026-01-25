@@ -161,12 +161,7 @@ export default function PetPage() {
         </div>
         <span className="mt-0.5 text-[9px] text-gray-400">{feedProgress}/{maxFeed}</span>
 
-        {/* ✅ 追加：在庫数のバッジ */}
-        {foodStock > 0 && (
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm animate-bounce">
-            {foodStock}
-          </div>
-        )}
+        
       </div>
 
       {/* ナビゲーション */}
