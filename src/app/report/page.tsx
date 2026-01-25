@@ -55,24 +55,27 @@ export default function ReportPage() {
       className="relative mx-auto h-screen w-full max-w-md overflow-hidden font-sans shadow-2xl border-x border-gray-200 flex flex-col bg-cover bg-center"
       style={{ backgroundImage: "url('/background.png')" }}
     >
-      <header className="px-4 pt-14 pb-4 flex items-center gap-4 z-10 shrink-0">
-        <Link href="/checkin" className="p-1 rounded-full bg-white/80 hover:bg-white shadow-sm backdrop-blur-sm transition">
-          <ChevronLeft size={28} className="text-gray-800" />
+      <header className="px-4 pt-14 pb-4 flex items-center gap-3 z-10 shrink-0">
+        <Link href="/checkin" className="inline-flex items-center text-gray-800 hover:opacity-70 transition">
+          <ChevronLeft size={32} className="text-gray-800" />
         </Link>
-        <h1 className="text-lg font-bold text-gray-800 drop-shadow-sm">タスク詳細</h1>
+        <h1 className="text-2xl font-bold text-gray-800 leading-none">タスク詳細</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-24">
-        {/* 顧客情報カード */}
-        <div className="bg-white p-5 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex justify-between items-start mb-2">
-            <h2 className="text-xl font-bold text-gray-800">製品デモ</h2>
-            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 font-bold border border-blue-200">商談</span>
-          </div>
-          <p className="text-sm text-gray-600 font-bold mb-4">株式会社Acme</p>
-          <div className="flex flex-col gap-2 text-xs text-gray-500 font-medium border-t border-gray-100 pt-3">
-            <div className="flex items-center gap-2"><Calendar size={14} /><span>1月20日 14:00</span></div>
-            <div className="flex items-center gap-2"><MapPin size={14} /><span>東京都渋谷区1-2-3</span></div>
+        {/* タスク情報カード */}
+        <div className="bg-white p-6 border-[3px] border-black">
+          <h2 className="text-[28px] font-bold text-black leading-snug">製品デモ</h2>
+          <p className="mt-2 text-lg text-gray-600 font-medium">株式会社ABC</p>
+          <div className="mt-6 flex flex-col gap-4 text-lg font-semibold text-black">
+            <div className="flex items-center gap-3">
+              <Calendar size={22} className="text-black" />
+              <span>期間：本日14:00</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <MapPin size={22} className="text-black" />
+              <span>東京都渋谷区1-2-3</span>
+            </div>
           </div>
         </div>
 
