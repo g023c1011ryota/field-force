@@ -80,6 +80,8 @@ export function LoginForm({
             padding: 12,
             marginTop: 4,
             fontSize: 16,
+            border: "2px solid #000",
+            borderRadius: 3,
             boxSizing: "border-box",
           }}
         />
@@ -101,6 +103,8 @@ export function LoginForm({
             padding: 12,
             marginTop: 4,
             fontSize: 16,
+            border: "2px solid #000",
+            borderRadius: 3,
             boxSizing: "border-box",
           }}
         />
